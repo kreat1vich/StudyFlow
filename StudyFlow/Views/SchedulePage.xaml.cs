@@ -8,7 +8,8 @@ public partial class SchedulePage : ContentPage
     private Dictionary<string, Editor> dayEditors = new();
     private Dictionary<string, Label> dayLabels = new();
 
-    private readonly string[] daysOfWeek = { "Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота" };
+    // Додали "Неділя" в кінець масиву днів тижня
+    private readonly string[] daysOfWeek = { "Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота", "Неділя" };
 
     public SchedulePage()
     {
@@ -36,20 +37,19 @@ public partial class SchedulePage : ContentPage
 
             var stack = new VerticalStackLayout { Spacing = 8 };
 
-            // Назва дня тижня (робимо світлішим та виразнішим акцентом)
+            // Назва дня тижня
             stack.Children.Add(new Label
             {
                 Text = day,
                 FontAttributes = FontAttributes.Bold,
                 FontSize = 16,
-                TextColor = Color.FromArgb("#8A75F5") // Світліший фіолетовий відтінок
+                TextColor = Color.FromArgb("#8A75F5")
             });
 
             // Статичний Label для перегляду
             var label = new Label
             {
                 Text = string.IsNullOrWhiteSpace(savedText) ? "Розклад не заповнено" : savedText,
-                // Для порожнього тексту даємо світліший сірий, для заповненого — майже чистий білий
                 TextColor = string.IsNullOrWhiteSpace(savedText) ? Color.FromArgb("#999999") : Color.FromArgb("#E0E0E0"),
                 FontSize = 14,
                 IsVisible = !isEditing
