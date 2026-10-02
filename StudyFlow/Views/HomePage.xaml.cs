@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Text.Json;
 using StudyFlow.Models;
 
 namespace StudyFlow.Views;
@@ -8,17 +9,18 @@ public partial class HomePage : ContentPage
     private bool isTimerRunning = false;
     private int sessionMinutes = 0;
 
-    // Словник для збереження накопиченого часу по предметах (у хвилинах)
+    private const string StatsStorageKey = "saved_study_stats";
+
+    // Словник для збереження часу по предметах
     private static Dictionary<string, int> subjectStats = new();
 
-    // Колекція для відображення в інтерфейсі
     public ObservableCollection<StatItem> StatsList { get; set; } = new();
 
     public HomePage()
     {
         InitializeComponent();
+        LoadStats(); // Завантажуємо збережену статистику
 
-        // Прив'язуємо CollectionView до нашої колекції
         StatsCollection.ItemsSource = StatsList;
         UpdateStatsUI();
     }
@@ -27,7 +29,7 @@ public partial class HomePage : ContentPage
     {
         if (string.IsNullOrWhiteSpace(TitleInput.Text) || string.IsNullOrWhiteSpace(SubjectInput.Text))
         {
-            DisplayAlert("Помилка", "Заповніть назву та предмет!", "ОК");
+            DisplayAlert("Помилка", "Заповніть назву та опис завдання!", "ОК");
             return;
         }
 
@@ -38,6 +40,9 @@ public partial class HomePage : ContentPage
             Deadline = string.IsNullOrWhiteSpace(DeadlineInput.Text) ? "Не вказано" : DeadlineInput.Text,
             IsCompleted = false
         });
+
+        // Зберігаємо оновлений список завдань у пам'ять
+        TasksPage.SaveTasks();
 
         TitleInput.Text = string.Empty;
         SubjectInput.Text = string.Empty;
@@ -92,7 +97,6 @@ public partial class HomePage : ContentPage
     {
         string subject = string.IsNullOrWhiteSpace(FocusSubjectInput.Text) ? "Інше" : FocusSubjectInput.Text.Trim();
 
-        // Додаємо хвилини до словника
         if (subjectStats.ContainsKey(subject))
         {
             subjectStats[subject] += sessionMinutes;
@@ -102,7 +106,8 @@ public partial class HomePage : ContentPage
             subjectStats[subject] = sessionMinutes;
         }
 
-        UpdateStatsUI(); // Оновлюємо список на екрані
+        SaveStats();     // Зберігаємо статистику в пам'ять
+        UpdateStatsUI(); // Оновлюємо інтерфейс
 
         DisplayAlert("Чудово!", $"Сесію на {sessionMinutes} хв завершено й зараховано до предмета «{subject}»!", "ОК");
         OnCancelFocusClicked(sender, e);
@@ -116,7 +121,44 @@ public partial class HomePage : ContentPage
         FocusDurationInput.IsEnabled = true;
     }
 
-    // Оновлення списку статистики з словника
+    // Збереження статистики у Preferences через JSON
+    private void SaveStats()
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(subjectStats);
+            Preferences.Set(StatsStorageKey, json);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Помилка збереження статистики: {ex.Message}");
+        }
+    }
+
+    // Завантаження статистики з Preferences
+    private void LoadStats()
+    {
+        if (Preferences.ContainsKey(StatsStorageKey))
+        {
+            var json = Preferences.Get(StatsStorageKey, string.Empty);
+            if (!string.IsNullOrEmpty(json))
+            {
+                try
+                {
+                    var loaded = JsonSerializer.Deserialize<Dictionary<string, int>>(json);
+                    if (loaded != null)
+                    {
+                        subjectStats = loaded;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Помилка читання статистики: {ex.Message}");
+                }
+            }
+        }
+    }
+
     private void UpdateStatsUI()
     {
         StatsList.Clear();
@@ -130,7 +172,6 @@ public partial class HomePage : ContentPage
         }
     }
 
-    // Перетворення хвилин у формат "X год Y хв"
     private string FormatMinutes(int totalMinutes)
     {
         int hours = totalMinutes / 60;
