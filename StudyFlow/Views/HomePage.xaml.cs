@@ -23,7 +23,7 @@ public partial class HomePage : ContentPage
         base.OnAppearing();
         UpdateDashboardData();
         UpdateDeadlinesData();
-        UpdateStreakData(); // Оновлюємо блок стріку при кожному появі сторінки
+        UpdateStreakData();
     }
 
     private void OnPeriodChanged(object sender, EventArgs e)
@@ -43,7 +43,6 @@ public partial class HomePage : ContentPage
     {
         StatsList.Clear();
 
-        // 1. Фільтруємо сесії залежно від обраного періоду
         var filteredSessions = FilterSessionsByPeriod(FocusPage.allSessions, currentPeriod);
 
         int totalMinutes = 0;
@@ -64,18 +63,15 @@ public partial class HomePage : ContentPage
 
         int totalSessionsCount = filteredSessions.Count;
 
-        // Заповнюємо UI показників
         LblTotalTime.Text = FormatMinutes(totalMinutes);
         LblTotalSessions.Text = totalSessionsCount.ToString();
 
         int avgMinutes = totalSessionsCount > 0 ? totalMinutes / totalSessionsCount : 0;
         LblAvgSession.Text = $"{avgMinutes} хв";
 
-        // Генерація графіку тижня (графік незмінно показує тижневу активність)
         GenerateChart();
     }
 
-    // Метод фільтрації сесій за кнопками періоду
     private List<StudySession> FilterSessionsByPeriod(List<StudySession> sessions, string period)
     {
         var today = DateTime.Today;
@@ -83,11 +79,8 @@ public partial class HomePage : ContentPage
         return period switch
         {
             "День" => sessions.Where(s => s.Date.Date == today).ToList(),
-
             "Тиждень" => sessions.Where(s => s.Date.Date >= today.AddDays(-6) && s.Date.Date <= today).ToList(),
-
             "Місяць" => sessions.Where(s => s.Date.Month == today.Month && s.Date.Year == today.Year).ToList(),
-
             _ => sessions
         };
     }
@@ -175,7 +168,6 @@ public partial class HomePage : ContentPage
         }
     }
 
-    // МЕХАНІКА СТРІКУ ТА ДНІВ ТИЖНЯ
     private void UpdateStreakData()
     {
         if (WeekDaysLayout == null || LblStreakCount == null) return;
@@ -201,11 +193,9 @@ public partial class HomePage : ContentPage
             checkDate = checkDate.AddDays(-1);
         }
 
-        // Виводимо число з правильним відмінюванням слова «день»
         string dayWord = GetDayWord(currentStreak);
         LblStreakCount.Text = $"Серія: {currentStreak} {dayWord} поспіль";
 
-        // Малюємо дні поточного тижня (Пн - Нд)
         int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
         var monday = today.AddDays(-diff);
 
@@ -239,7 +229,6 @@ public partial class HomePage : ContentPage
         }
     }
 
-    // Допоміжний метод для правильного відмінювання слова «день»
     private string GetDayWord(int count)
     {
         int mod10 = count % 10;
@@ -285,51 +274,64 @@ public partial class HomePage : ContentPage
                 weeklyStats[dayKey] += session.Minutes;
         }
 
-        // Знаходимо максимальне значення за тиждень для пропорційного масштабування
         int maxMinutes = weeklyStats.Values.Max();
 
         foreach (var day in weeklyStats)
         {
-            int blocksCount = 0;
-            if (day.Value > 0)
+            var rowGrid = new Grid
             {
-                if (maxMinutes > 0)
+                ColumnDefinitions = new ColumnDefinitionCollection
                 {
-                    // Пропорція відносно найпродуктивнішого дня (максимум 10 блоків)
-                    blocksCount = (int)Math.Round((double)day.Value / maxMinutes * 10);
-                    // Навіть за невеликої активності показуємо мінімум 1 блок
-                    blocksCount = Math.Max(1, blocksCount);
-                }
-                else
-                {
-                    blocksCount = 1;
-                }
-            }
+                    new ColumnDefinition(GridLength.Auto),
+                    new ColumnDefinition(GridLength.Star),
+                    new ColumnDefinition(GridLength.Auto)
+                },
+                ColumnSpacing = 10,
+                VerticalOptions = LayoutOptions.Center
+            };
 
-            string blocks = blocksCount > 0 ? new string('█', blocksCount) : "—";
-            Color textColor = blocksCount > 0 ? Color.FromArgb("#512BD4") : Color.FromArgb("#555555");
-
-            var rowLayout = new HorizontalStackLayout { Spacing = 10 };
-
-            rowLayout.Children.Add(new Label
+            // 1. Назва дня
+            var lblDay = new Label
             {
                 Text = day.Key,
                 TextColor = Color.FromArgb("#B0B0B0"),
-                WidthRequest = 30,
-                FontSize = 14,
+                FontSize = 13,
+                WidthRequest = 25,
                 VerticalOptions = LayoutOptions.Center
-            });
+            };
+            Grid.SetColumn(lblDay, 0);
+            rowGrid.Children.Add(lblDay);
 
-            rowLayout.Children.Add(new Label
+            // 2. Смужка (бар)
+            double maxWidth = 160;
+            double barWidth = day.Value > 0 ? Math.Max(15, (double)day.Value / (maxMinutes > 0 ? maxMinutes : 1) * maxWidth) : 0;
+
+            var bar = new BoxView
             {
-                Text = blocks,
-                TextColor = textColor,
-                FontAttributes = FontAttributes.Bold,
-                FontSize = 14,
+                HeightRequest = 10,
+                WidthRequest = barWidth,
+                BackgroundColor = day.Value > 0 ? Color.FromArgb("#512BD4") : Color.FromArgb("#2C2C2C"),
+                CornerRadius = 5,
+                HorizontalOptions = LayoutOptions.Start,
                 VerticalOptions = LayoutOptions.Center
-            });
+            };
+            Grid.SetColumn(bar, 1);
+            rowGrid.Children.Add(bar);
 
-            ChartLayout.Children.Add(rowLayout);
+            // 3. Текст із хвилинами праворуч
+            string timeText = day.Value > 0 ? FormatMinutes(day.Value) : "—";
+            var lblMinutes = new Label
+            {
+                Text = timeText,
+                TextColor = day.Value > 0 ? Colors.White : Color.FromArgb("#777777"),
+                FontSize = 12,
+                HorizontalOptions = LayoutOptions.End,
+                VerticalOptions = LayoutOptions.Center
+            };
+            Grid.SetColumn(lblMinutes, 2);
+            rowGrid.Children.Add(lblMinutes);
+
+            ChartLayout.Children.Add(rowGrid);
         }
     }
 

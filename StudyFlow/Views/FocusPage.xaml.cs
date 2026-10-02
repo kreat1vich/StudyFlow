@@ -107,8 +107,16 @@ public partial class FocusPage : ContentPage
         ResetFocusUI();
     }
 
-    private void OnContinueFocusClicked(object sender, EventArgs e)
+    private async void OnContinueFocusClicked(object sender, EventArgs e)
     {
+        // 1. Визначаємо предмет і записуємо сесію в історію та JSON
+        string subject = string.IsNullOrWhiteSpace(FocusSubjectInput.Text) ? "Інше" : FocusSubjectInput.Text.Trim();
+        RecordSession(subject, sessionMinutes);
+
+        // 2. Показуємо плашку з успішним зарахуванням часу (await чекає, поки користувач натисне «ОК»)
+        await DisplayAlert("Чудово!", $"Сесію на {sessionMinutes} хв зараховано до «{subject}»!", "ОК");
+
+        // 3. Ховаємо блок завершення та скидаємо інтерфейс для наступного старту
         TimerFinishedLayout.IsVisible = false;
         ResetFocusUI();
     }

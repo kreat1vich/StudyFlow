@@ -125,4 +125,10 @@ public partial class TasksPage : ContentPage
         SubjectInput.Text = string.Empty;
         DeadlineInput.Text = string.Empty;
     }
+
+    private void OnCheckBoxCheckedChanged(object sender, CheckedChangedEventArgs e)
+    {
+        // Коли статус чекбокса змінюється, одразу зберігаємо оновлений список у JSON
+        SaveTasks();
+    }
 }
