@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using StudyFlow.Models;
 
 namespace StudyFlow.Views;
@@ -6,30 +7,29 @@ namespace StudyFlow.Views;
 public partial class HomePage : ContentPage
 {
     public ObservableCollection<StatItem> StatsList { get; set; } = new();
+    public ObservableCollection<DeadlineViewModel> DeadlinesList { get; set; } = new();
 
-    // Зберігаємо обраний період ("День", "Тиждень", "Місяць")
     private string currentPeriod = "Тиждень";
 
     public HomePage()
     {
         InitializeComponent();
         StatsCollection.ItemsSource = StatsList;
+        DeadlinesCollection.ItemsSource = DeadlinesList;
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
         UpdateDashboardData();
+        UpdateDeadlinesData();
     }
 
-    // Обробка перемикача періодів (День / Тиждень / Місяць)
     private void OnPeriodChanged(object sender, EventArgs e)
     {
         if (sender is Button button)
         {
             currentPeriod = button.Text;
-
-            // Змінюємо візуальний стиль кнопок (активна підсвічується фіолетовим)
             BtnDay.BackgroundColor = currentPeriod == "День" ? Color.FromArgb("#512BD4") : Color.FromArgb("#2C2C2C");
             BtnWeek.BackgroundColor = currentPeriod == "Тиждень" ? Color.FromArgb("#512BD4") : Color.FromArgb("#2C2C2C");
             BtnMonth.BackgroundColor = currentPeriod == "Місяць" ? Color.FromArgb("#512BD4") : Color.FromArgb("#2C2C2C");
@@ -38,49 +38,177 @@ public partial class HomePage : ContentPage
         }
     }
 
-    // Головний метод оновлення всієї статистики на сторінці
     private void UpdateDashboardData()
     {
         StatsList.Clear();
 
-        int totalMinutes = 0;
+        // 1. Фільтруємо сесії залежно від обраного періоду
+        var filteredSessions = FilterSessionsByPeriod(FocusPage.allSessions, currentPeriod);
 
-        // Рахуємо сумарний час з усіх предметів
-        foreach (var pair in FocusPage.subjectStats)
+        int totalMinutes = 0;
+        var subjectGrouped = filteredSessions
+            .GroupBy(s => s.Subject)
+            .Select(g => new { Subject = g.Key, TotalMinutes = g.Sum(s => s.Minutes) })
+            .OrderByDescending(x => x.TotalMinutes);
+
+        foreach (var item in subjectGrouped)
         {
-            totalMinutes += pair.Value;
+            totalMinutes += item.TotalMinutes;
             StatsList.Add(new StatItem
             {
-                Subject = pair.Key,
-                TimeFormatted = FormatMinutes(pair.Value)
+                Subject = item.Subject,
+                TimeFormatted = FormatMinutes(item.TotalMinutes)
             });
         }
 
-        // Кількість сесій (можеш налаштувати під себе, наприклад, кількість записів у словнику або фіксоване число)
-        int totalSessions = FocusPage.subjectStats.Count > 0 ? FocusPage.subjectStats.Values.Count * 2 : 0;
+        int totalSessionsCount = filteredSessions.Count;
 
         // Заповнюємо UI показників
         LblTotalTime.Text = FormatMinutes(totalMinutes);
-        LblTotalSessions.Text = totalSessions.ToString();
+        LblTotalSessions.Text = totalSessionsCount.ToString();
 
-        int avgMinutes = totalSessions > 0 ? totalMinutes / totalSessions : 0;
+        int avgMinutes = totalSessionsCount > 0 ? totalMinutes / totalSessionsCount : 0;
         LblAvgSession.Text = $"{avgMinutes} хв";
 
-        // Генерація графіку з урахуванням реального часу
-        GenerateChart(totalMinutes);
+        // Генерація графіку тижня (графік незмінно показує тижневу активність)
+        GenerateChart();
     }
 
-    // Генерація блокового графіку на зразок Пн ███████
-    private void GenerateChart(int baseMinutes)
+    // Метод фільтрації сесій за кнопками періоду
+    private List<StudySession> FilterSessionsByPeriod(List<StudySession> sessions, string period)
+    {
+        var today = DateTime.Today;
+
+        return period switch
+        {
+            "День" => sessions.Where(s => s.Date.Date == today).ToList(),
+
+            "Тиждень" => sessions.Where(s => s.Date.Date >= today.AddDays(-6) && s.Date.Date <= today).ToList(),
+
+            "Місяць" => sessions.Where(s => s.Date.Month == today.Month && s.Date.Year == today.Year).ToList(),
+
+            _ => sessions
+        };
+    }
+
+    private void UpdateDeadlinesData()
+    {
+        DeadlinesList.Clear();
+
+        var activeTasks = TasksPage.Tasks
+            .Where(t => !t.IsCompleted)
+            .ToList();
+
+        foreach (var task in activeTasks)
+        {
+            string daysLeftStr = "Без дедлайну";
+            string icon = "📌";
+            Color color = Color.FromArgb("#B0B0B0");
+            int sortPriority = 0;
+            DateTime targetDate = DateTime.MaxValue;
+
+            if (!string.IsNullOrWhiteSpace(task.Deadline) && task.Deadline != "Не вказано")
+            {
+                if (DateTime.TryParseExact(task.Deadline.Trim() + ".2026", "dd.MM.yyyy",
+                    CultureInfo.InvariantCulture, DateTimeStyles.None, out targetDate))
+                {
+                    var today = DateTime.Today;
+                    int daysDiff = (targetDate.Date - today).Days;
+
+                    if (daysDiff < 0)
+                    {
+                        daysLeftStr = $"Прострочено на {Math.Abs(daysDiff)} дн.";
+                        icon = "❌";
+                        color = Color.FromArgb("#FF5252");
+                        sortPriority = -1;
+                    }
+                    else if (daysDiff == 0)
+                    {
+                        daysLeftStr = "Сьогодні";
+                        icon = "⚠";
+                        color = Color.FromArgb("#FF5252");
+                        sortPriority = 0;
+                    }
+                    else if (daysDiff == 1)
+                    {
+                        daysLeftStr = "Завтра";
+                        icon = "🟡";
+                        color = Color.FromArgb("#FFB74D");
+                        sortPriority = 1;
+                    }
+                    else
+                    {
+                        daysLeftStr = $"Через {daysDiff} дн.";
+                        icon = "🟢";
+                        color = Color.FromArgb("#81C784");
+                        sortPriority = 2;
+                    }
+                }
+            }
+            else
+            {
+                sortPriority = -2;
+            }
+
+            DeadlinesList.Add(new DeadlineViewModel
+            {
+                DisplayTitle = $"{task.Subject} — {task.Title}",
+                DeadlineText = task.Deadline,
+                DaysLeftString = daysLeftStr,
+                IndicatorIcon = icon,
+                IndicatorColor = color,
+                TargetDate = targetDate,
+                SortPriority = sortPriority
+            });
+        }
+
+        var sorted = DeadlinesList
+            .OrderBy(d => d.SortPriority)
+            .ThenBy(d => d.TargetDate)
+            .ToList();
+
+        DeadlinesList.Clear();
+        foreach (var item in sorted)
+        {
+            DeadlinesList.Add(item);
+        }
+    }
+
+    private void GenerateChart()
     {
         ChartLayout.Children.Clear();
 
-        // Беремо реальні дані з FocusPage.weeklyStats по днях тижня
-        var days = FocusPage.weeklyStats;
-
-        foreach (var day in days)
+        // Збираємо дані по днях тижня з історії сесій
+        var today = DateTime.Today;
+        Dictionary<string, int> weeklyStats = new()
         {
-            // Якщо за цей день є хвилини, малюємо блоки (1 блок = 1 хвилина або налаштуй масштаб, наприклад / 5)
+            { "Пн", 0 }, { "Вт", 0 }, { "Ср", 0 }, { "Чт", 0 }, { "Пт", 0 }, { "Сб", 0 }, { "Нд", 0 }
+        };
+
+        // Беремо сесії за останні 7 днів для графіку
+        var recentSessions = FocusPage.allSessions
+            .Where(s => s.Date.Date >= today.AddDays(-6) && s.Date.Date <= today);
+
+        foreach (var session in recentSessions)
+        {
+            string dayKey = session.Date.DayOfWeek switch
+            {
+                DayOfWeek.Monday => "Пн",
+                DayOfWeek.Tuesday => "Вт",
+                DayOfWeek.Wednesday => "Ср",
+                DayOfWeek.Thursday => "Чт",
+                DayOfWeek.Friday => "Пт",
+                DayOfWeek.Saturday => "Сб",
+                DayOfWeek.Sunday => "Нд",
+                _ => "Пн"
+            };
+
+            if (weeklyStats.ContainsKey(dayKey))
+                weeklyStats[dayKey] += session.Minutes;
+        }
+
+        foreach (var day in weeklyStats)
+        {
             int blocksCount = day.Value > 0 ? Math.Max(1, day.Value / 5) : 0;
             string blocks = blocksCount > 0 ? new string('█', Math.Min(blocksCount, 12)) : "—";
             Color textColor = blocksCount > 0 ? Color.FromArgb("#512BD4") : Color.FromArgb("#555555");
@@ -118,4 +246,15 @@ public partial class HomePage : ContentPage
         if (hours > 0) return $"{hours} год";
         return $"{minutes} хв";
     }
+}
+
+public class DeadlineViewModel
+{
+    public string DisplayTitle { get; set; }
+    public string DeadlineText { get; set; }
+    public string DaysLeftString { get; set; }
+    public string IndicatorIcon { get; set; }
+    public Color IndicatorColor { get; set; }
+    public DateTime TargetDate { get; set; }
+    public int SortPriority { get; set; }
 }

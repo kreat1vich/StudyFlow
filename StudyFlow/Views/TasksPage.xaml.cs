@@ -1,6 +1,7 @@
 using StudyFlow.Models;
 using System.Collections.ObjectModel;
 using System.Text.Json;
+using System.Globalization;
 
 namespace StudyFlow.Views;
 
@@ -12,11 +13,16 @@ public partial class TasksPage : ContentPage
     public TasksPage()
     {
         InitializeComponent();
-        LoadTasks(); // Завантажуємо збережені завдання при відкритті
+        LoadTasks(); // Завантажуємо та сортуємо завдання при відкритті
         TasksCollection.ItemsSource = Tasks;
     }
 
     // Метод збереження завдань
+    public static void SaveStats() // Залишаємо сумісність, якщо потрібно
+    {
+        SaveTasks();
+    }
+
     public static void SaveTasks()
     {
         try
@@ -48,6 +54,7 @@ public partial class TasksPage : ContentPage
                         {
                             Tasks.Add(item);
                         }
+                        SortTasks(); // Сортуємо одразу після завантаження
                     }
                 }
                 catch (Exception ex)
@@ -55,6 +62,34 @@ public partial class TasksPage : ContentPage
                     Console.WriteLine($"Помилка читання завдань: {ex.Message}");
                 }
             }
+        }
+    }
+
+    // Метод сортування за дедлайнами
+    private void SortTasks()
+    {
+        var sortedList = Tasks
+            .OrderBy(t => string.IsNullOrWhiteSpace(t.Deadline) || t.Deadline == "Не вказано" ? 0 : 1) // 0 — спочатку без дедлайну
+            .ThenBy(t =>
+            {
+                if (string.IsNullOrWhiteSpace(t.Deadline) || t.Deadline == "Не вказано")
+                    return DateTime.MinValue;
+
+                // Парсимо формат "04.10" з урахуванням поточного року (2026)
+                if (DateTime.TryParseExact(t.Deadline.Trim() + ".2026", "dd.MM.yyyy",
+                    CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
+                {
+                    return parsedDate;
+                }
+
+                return DateTime.MaxValue; // Якщо введений незрозумілий текст — кидаємо в кінець
+            })
+            .ToList();
+
+        Tasks.Clear();
+        foreach (var item in sortedList)
+        {
+            Tasks.Add(item);
         }
     }
 
@@ -79,11 +114,12 @@ public partial class TasksPage : ContentPage
         {
             Title = TitleInput.Text,
             Subject = SubjectInput.Text,
-            Deadline = string.IsNullOrWhiteSpace(DeadlineInput.Text) ? "Не вказано" : DeadlineInput.Text,
+            Deadline = string.IsNullOrWhiteSpace(DeadlineInput.Text) ? "Не вказано" : DeadlineInput.Text.Trim(),
             IsCompleted = false
         });
 
-        SaveTasks();
+        SortTasks(); // Сортуємо список одразу після додавання нової задачі
+        SaveTasks(); // Зберігаємо актуальний відсортований стан
 
         TitleInput.Text = string.Empty;
         SubjectInput.Text = string.Empty;

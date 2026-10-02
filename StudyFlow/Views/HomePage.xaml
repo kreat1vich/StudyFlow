@@ -20,6 +20,33 @@
                 <Button x:Name="BtnMonth" Text="Місяць" Clicked="OnPeriodChanged" BackgroundColor="#2C2C2C" TextColor="White" CornerRadius="8" WidthRequest="90" />
             </HorizontalStackLayout>
 
+            <!-- НАЙБЛИЖЧІ ДЕДЛАЙНИ -->
+            <Frame BackgroundColor="#1E1E1E" CornerRadius="16" Padding="16" HasShadow="False">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="📌 Найближчі дедлайни" FontSize="18" FontAttributes="Bold" TextColor="White" />
+
+                    <CollectionView x:Name="DeadlinesCollection" HeightRequest="140" SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="Auto, *, Auto" Padding="0,6" ColumnSpacing="10">
+                                    <!-- Індикатор/Іконка або статус -->
+                                    <Label Grid.Column="0" Text="{Binding IndicatorIcon}" FontSize="14" VerticalOptions="Center"/>
+
+                                    <!-- Назва та предмет -->
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                        <Label Text="{Binding DisplayTitle}" TextColor="White" FontSize="14" FontAttributes="Bold" />
+                                        <Label Text="{Binding DeadlineText}" TextColor="{Binding IndicatorColor}" FontSize="12" />
+                                    </VerticalStackLayout>
+
+                                    <!-- Залишок днів -->
+                                    <Label Grid.Column="2" Text="{Binding DaysLeftString}" TextColor="#B0B0B0" FontSize="12" VerticalOptions="Center" HorizontalOptions="End" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
             <!-- КАРТКА З ПОКАЗНИКАМИ (СПИСКОМ) -->
             <Frame BackgroundColor="#1E1E1E" CornerRadius="16" Padding="16" HasShadow="False">
                 <VerticalStackLayout Spacing="12">

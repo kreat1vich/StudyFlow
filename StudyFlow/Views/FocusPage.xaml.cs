@@ -11,21 +11,15 @@ public partial class FocusPage : ContentPage
     private int elapsedSeconds = 0;
     private int totalSeconds = 0;
 
-    private const string StatsStorageKey = "saved_study_stats";
-    private const string WeeklyStatsStorageKey = "saved_weekly_study_stats";
+    private const string SessionsStorageKey = "saved_study_sessions_history";
 
-    public static Dictionary<string, int> subjectStats = new();
-
-    // Зберігаємо хвилини по днях тижня
-    public static Dictionary<string, int> weeklyStats = new()
-    {
-        { "Пн", 0 }, { "Вт", 0 }, { "Ср", 0 }, { "Чт", 0 }, { "Пт", 0 }, { "Сб", 0 }, { "Нд", 0 }
-    };
+    // Список усіх збережених сесій
+    public static List<StudySession> allSessions = new();
 
     public FocusPage()
     {
         InitializeComponent();
-        LoadStats();
+        LoadSessions();
     }
 
     private async void OnStartFocusClicked(object sender, EventArgs e)
@@ -86,27 +80,19 @@ public partial class FocusPage : ContentPage
         isTimerRunning = false;
         TimerActiveLayout.IsVisible = false;
 
+        // Рахуємо чесно цілі хвилини (без секундного округлення вгору)
         int actualMinutes = elapsedSeconds / 60;
 
         if (actualMinutes > 0)
         {
             string subject = string.IsNullOrWhiteSpace(FocusSubjectInput.Text) ? "Інше" : FocusSubjectInput.Text.Trim();
 
-            // Оновлюємо статистику предметів
-            if (subjectStats.ContainsKey(subject))
-                subjectStats[subject] += actualMinutes;
-            else
-                subjectStats[subject] = actualMinutes;
-
-            // Додаємо хвилини до поточного дня тижня
-            AddMinutesToCurrentDay(actualMinutes);
-
-            SaveStats();
+            RecordSession(subject, actualMinutes);
             DisplayAlert("Сесію завершено", $"Достроково зараховано {actualMinutes} хв до предмета «{subject}».", "ОК");
         }
         else
         {
-            DisplayAlert("Скасовано", "Сесія тривала занадто мало, час не зараховано.", "ОК");
+            DisplayAlert("Скасовано", "Сесія тривала занадто мало (менше хвилини), час не зараховано.", "ОК");
         }
 
         ResetFocusUI();
@@ -116,16 +102,7 @@ public partial class FocusPage : ContentPage
     {
         string subject = string.IsNullOrWhiteSpace(FocusSubjectInput.Text) ? "Інше" : FocusSubjectInput.Text.Trim();
 
-        // Оновлюємо статистику предметів
-        if (subjectStats.ContainsKey(subject))
-            subjectStats[subject] += sessionMinutes;
-        else
-            subjectStats[subject] = sessionMinutes;
-
-        // Додаємо хвилини до поточного дня тижня
-        AddMinutesToCurrentDay(sessionMinutes);
-
-        SaveStats();
+        RecordSession(subject, sessionMinutes);
         DisplayAlert("Чудово!", $"Сесію на {sessionMinutes} хв зараховано до «{subject}»!", "ОК");
         ResetFocusUI();
     }
@@ -136,34 +113,17 @@ public partial class FocusPage : ContentPage
         ResetFocusUI();
     }
 
-    // Допоміжний метод для додавання часу до правильного дня тижня
-    private void AddMinutesToCurrentDay(int minutes)
+    // Метод запису нової сесії в історію
+    private void RecordSession(string subject, int minutes)
     {
-        string currentDayKey = GetCurrentDayKey();
-        if (weeklyStats.ContainsKey(currentDayKey))
+        allSessions.Add(new StudySession
         {
-            weeklyStats[currentDayKey] += minutes;
-        }
-        else
-        {
-            weeklyStats["Пн"] += minutes; // На всяк випадок страховка
-        }
-    }
+            Subject = subject,
+            Minutes = minutes,
+            Date = DateTime.Now
+        });
 
-    // Визначаємо поточний день тижня українською
-    private string GetCurrentDayKey()
-    {
-        return DateTime.Now.DayOfWeek switch
-        {
-            DayOfWeek.Monday => "Пн",
-            DayOfWeek.Tuesday => "Вт",
-            DayOfWeek.Wednesday => "Ср",
-            DayOfWeek.Thursday => "Чт",
-            DayOfWeek.Friday => "Пт",
-            DayOfWeek.Saturday => "Сб",
-            DayOfWeek.Sunday => "Нд",
-            _ => "Пн"
-        };
+        SaveSessions();
     }
 
     private void ResetFocusUI()
@@ -178,51 +138,33 @@ public partial class FocusPage : ContentPage
         BtnPauseResume.Text = "Пауза";
     }
 
-    public static void SaveStats()
+    public static void SaveSessions()
     {
         try
         {
-            var jsonStats = JsonSerializer.Serialize(subjectStats);
-            Preferences.Set(StatsStorageKey, jsonStats);
-
-            var jsonWeekly = JsonSerializer.Serialize(weeklyStats);
-            Preferences.Set(WeeklyStatsStorageKey, jsonWeekly);
+            var json = JsonSerializer.Serialize(allSessions);
+            Preferences.Set(SessionsStorageKey, json);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Помилка збереження: {ex.Message}");
+            Console.WriteLine($"Помилка збереження сесій: {ex.Message}");
         }
     }
 
-    private void LoadStats()
+    private void LoadSessions()
     {
-        try
+        if (Preferences.ContainsKey(SessionsStorageKey))
         {
-            // Завантаження предметів
-            if (Preferences.ContainsKey(StatsStorageKey))
+            var json = Preferences.Get(SessionsStorageKey, string.Empty);
+            if (!string.IsNullOrEmpty(json))
             {
-                var json = Preferences.Get(StatsStorageKey, string.Empty);
-                if (!string.IsNullOrEmpty(json))
+                try
                 {
-                    var loaded = JsonSerializer.Deserialize<Dictionary<string, int>>(json);
-                    if (loaded != null) subjectStats = loaded;
+                    var loaded = JsonSerializer.Deserialize<List<StudySession>>(json);
+                    if (loaded != null) allSessions = loaded;
                 }
+                catch { }
             }
-
-            // Завантаження щоденної статистики
-            if (Preferences.ContainsKey(WeeklyStatsStorageKey))
-            {
-                var jsonWeekly = Preferences.Get(WeeklyStatsStorageKey, string.Empty);
-                if (!string.IsNullOrEmpty(jsonWeekly))
-                {
-                    var loadedWeekly = JsonSerializer.Deserialize<Dictionary<string, int>>(jsonWeekly);
-                    if (loadedWeekly != null) weeklyStats = loadedWeekly;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Помилка завантаження: {ex.Message}");
         }
     }
 }
