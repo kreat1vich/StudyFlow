@@ -11,7 +11,7 @@
             <Frame BackgroundColor="#1E1E1E" CornerRadius="16" Padding="16" HasShadow="False">
                 <VerticalStackLayout Spacing="12">
                     <Label Text="Що зараз робимо?" TextColor="#B0B0B0" FontSize="14" />
-                    <Entry x:Name="FocusSubjectInput" Placeholder="Назва завдання / предмет" PlaceholderColor="#777" TextColor="White" BackgroundColor="#2C2C2C" />
+                    <Entry x:Name="FocusSubjectInput" Placeholder="Назва завдання / предмету" PlaceholderColor="#777" TextColor="White" BackgroundColor="#2C2C2C" />
 
                     <Label Text="Тривалість (хв):" TextColor="#B0B0B0" FontSize="14" />
                     <Entry x:Name="FocusDurationInput" Placeholder="Наприклад: 25" PlaceholderColor="#777" TextColor="White" BackgroundColor="#2C2C2C" />

@@ -23,6 +23,7 @@ public partial class HomePage : ContentPage
         base.OnAppearing();
         UpdateDashboardData();
         UpdateDeadlinesData();
+        UpdateStreakData(); // Оновлюємо блок стріку при кожному появі сторінки
     }
 
     private void OnPeriodChanged(object sender, EventArgs e)
@@ -174,18 +175,95 @@ public partial class HomePage : ContentPage
         }
     }
 
+    // МЕХАНІКА СТРІКУ ТА ДНІВ ТИЖНЯ
+    private void UpdateStreakData()
+    {
+        if (WeekDaysLayout == null || LblStreakCount == null) return;
+
+        WeekDaysLayout.Children.Clear();
+
+        var today = DateTime.Today;
+        int currentStreak = 0;
+
+        const int minMinutesForStreak = 5;
+
+        var dailyTotals = FocusPage.allSessions
+            .GroupBy(s => s.Date.Date)
+            .ToDictionary(g => g.Key, g => g.Sum(s => s.Minutes));
+
+        var checkDate = dailyTotals.ContainsKey(today) && dailyTotals[today] >= minMinutesForStreak
+            ? today
+            : today.AddDays(-1);
+
+        while (dailyTotals.ContainsKey(checkDate) && dailyTotals[checkDate] >= minMinutesForStreak)
+        {
+            currentStreak++;
+            checkDate = checkDate.AddDays(-1);
+        }
+
+        // Виводимо число з правильним відмінюванням слова «день»
+        string dayWord = GetDayWord(currentStreak);
+        LblStreakCount.Text = $"Серія: {currentStreak} {dayWord} поспіль";
+
+        // Малюємо дні поточного тижня (Пн - Нд)
+        int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
+        var monday = today.AddDays(-diff);
+
+        string[] dayNames = { "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд" };
+
+        for (int i = 0; i < 7; i++)
+        {
+            var targetDay = monday.AddDays(i);
+            bool isDone = dailyTotals.ContainsKey(targetDay) && dailyTotals[targetDay] >= minMinutesForStreak;
+
+            string statusIcon = isDone ? "✅" : "—";
+
+            var dayStack = new VerticalStackLayout { Spacing = 2, HorizontalOptions = LayoutOptions.Center };
+
+            dayStack.Children.Add(new Label
+            {
+                Text = dayNames[i],
+                TextColor = Color.FromArgb("#B0B0B0"),
+                FontSize = 12,
+                HorizontalOptions = LayoutOptions.Center
+            });
+
+            dayStack.Children.Add(new Label
+            {
+                Text = statusIcon,
+                FontSize = 14,
+                HorizontalOptions = LayoutOptions.Center
+            });
+
+            WeekDaysLayout.Children.Add(dayStack);
+        }
+    }
+
+    // Допоміжний метод для правильного відмінювання слова «день»
+    private string GetDayWord(int count)
+    {
+        int mod10 = count % 10;
+        int mod100 = count % 100;
+
+        if (mod100 >= 11 && mod100 <= 14)
+            return "днів";
+        if (mod10 == 1)
+            return "день";
+        if (mod10 >= 2 && mod10 <= 4)
+            return "дні";
+        return "днів";
+    }
+
     private void GenerateChart()
     {
         ChartLayout.Children.Clear();
 
-        // Збираємо дані по днях тижня з історії сесій
         var today = DateTime.Today;
         Dictionary<string, int> weeklyStats = new()
         {
             { "Пн", 0 }, { "Вт", 0 }, { "Ср", 0 }, { "Чт", 0 }, { "Пт", 0 }, { "Сб", 0 }, { "Нд", 0 }
         };
 
-        // Беремо сесії за останні 7 днів для графіку
         var recentSessions = FocusPage.allSessions
             .Where(s => s.Date.Date >= today.AddDays(-6) && s.Date.Date <= today);
 
@@ -207,10 +285,28 @@ public partial class HomePage : ContentPage
                 weeklyStats[dayKey] += session.Minutes;
         }
 
+        // Знаходимо максимальне значення за тиждень для пропорційного масштабування
+        int maxMinutes = weeklyStats.Values.Max();
+
         foreach (var day in weeklyStats)
         {
-            int blocksCount = day.Value > 0 ? Math.Max(1, day.Value / 5) : 0;
-            string blocks = blocksCount > 0 ? new string('█', Math.Min(blocksCount, 12)) : "—";
+            int blocksCount = 0;
+            if (day.Value > 0)
+            {
+                if (maxMinutes > 0)
+                {
+                    // Пропорція відносно найпродуктивнішого дня (максимум 10 блоків)
+                    blocksCount = (int)Math.Round((double)day.Value / maxMinutes * 10);
+                    // Навіть за невеликої активності показуємо мінімум 1 блок
+                    blocksCount = Math.Max(1, blocksCount);
+                }
+                else
+                {
+                    blocksCount = 1;
+                }
+            }
+
+            string blocks = blocksCount > 0 ? new string('█', blocksCount) : "—";
             Color textColor = blocksCount > 0 ? Color.FromArgb("#512BD4") : Color.FromArgb("#555555");
 
             var rowLayout = new HorizontalStackLayout { Spacing = 10 };

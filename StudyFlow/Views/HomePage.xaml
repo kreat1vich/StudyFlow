@@ -100,6 +100,21 @@
                 </VerticalStackLayout>
             </Frame>
 
+            <!-- БЛОК СТРІКУ ТА АКТИВНОСТІ -->
+            <Frame BackgroundColor="#1E1E1E" CornerRadius="16" Padding="16" HasShadow="False">
+                <VerticalStackLayout Spacing="10">
+                    <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <Label Text="🔥" FontSize="20" VerticalOptions="Center"/>
+                        <Label x:Name="LblStreakCount" Text="Серія: 0 днів" FontSize="18" FontAttributes="Bold" TextColor="White" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+
+                    <!-- Візуальні дні тижня -->
+                    <HorizontalStackLayout x:Name="WeekDaysLayout" Spacing="12" HorizontalOptions="Center" Margin="0,5,0,0">
+                        <!-- Тут динамічно з'являтимуться Пн ✅, Вт ✅ тощо -->
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
