@@ -39,7 +39,12 @@
                     <!-- Елементи таймера -->
                     <VerticalStackLayout x:Name="TimerActiveLayout" IsVisible="False" Spacing="15" HorizontalOptions="Center" Margin="0,10,0,0">
                         <Label x:Name="LblTimerDisplay" Text="25:00" FontSize="44" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" />
-                        <Button Text="Скасувати" Clicked="OnCancelFocusClicked" BackgroundColor="#C62828" TextColor="White" CornerRadius="8" WidthRequest="150" />
+
+                        <!-- Кнопки керування таймером (Пауза/Продовжити та Скасувати/Завершити) -->
+                        <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+                            <Button x:Name="BtnPauseResume" Text="Пауза" Clicked="OnPauseResumeClicked" BackgroundColor="#F57C00" TextColor="White" CornerRadius="8" WidthRequest="110" />
+                            <Button x:Name="BtnEndEarly" Text="Завершити" Clicked="OnEndEarlyClicked" BackgroundColor="#C62828" TextColor="White" CornerRadius="8" WidthRequest="110" />
+                        </HorizontalStackLayout>
                     </VerticalStackLayout>
 
                     <!-- Елементи після завершення -->

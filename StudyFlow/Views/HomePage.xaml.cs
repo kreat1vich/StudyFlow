@@ -7,7 +7,10 @@ namespace StudyFlow.Views;
 public partial class HomePage : ContentPage
 {
     private bool isTimerRunning = false;
+    private bool isPaused = false;
     private int sessionMinutes = 0;
+    private int elapsedSeconds = 0; // Скільки секунд вже реально пройшло
+    private int totalSeconds = 0;   // Загальна тривалість сесії в секундах
 
     private const string StatsStorageKey = "saved_study_stats";
 
@@ -62,35 +65,100 @@ public partial class HomePage : ContentPage
         FocusSubjectInput.IsEnabled = false;
         FocusDurationInput.IsEnabled = false;
         TimerActiveLayout.IsVisible = true;
+
         isTimerRunning = true;
+        isPaused = false;
+        BtnPauseResume.Text = "Пауза";
 
-        int totalSeconds = sessionMinutes * 60;
+        totalSeconds = sessionMinutes * 60;
+        elapsedSeconds = 0;
 
-        while (isTimerRunning && totalSeconds > 0)
+        while (isTimerRunning && elapsedSeconds < totalSeconds)
         {
-            int min = totalSeconds / 60;
-            int sec = totalSeconds % 60;
+            if (isPaused)
+            {
+                await Task.Delay(500);
+                continue;
+            }
+
+            int remainingSeconds = totalSeconds - elapsedSeconds;
+            int min = remainingSeconds / 60;
+            int sec = remainingSeconds % 60;
             LblTimerDisplay.Text = $"{min:D2}:{sec:D2}";
 
             await Task.Delay(1000);
-            totalSeconds--;
+
+            if (isTimerRunning && !isPaused)
+            {
+                elapsedSeconds++;
+            }
         }
 
-        if (isTimerRunning)
+        // Якщо таймер дійшов до кінця сам (без дострокового завершення)
+        if (isTimerRunning && elapsedSeconds >= totalSeconds)
         {
             TimerActiveLayout.IsVisible = false;
             TimerFinishedLayout.IsVisible = true;
         }
     }
 
+    private void OnPauseResumeClicked(object sender, EventArgs e)
+    {
+        isPaused = !isPaused;
+        BtnPauseResume.Text = isPaused ? "Продовжити" : "Пауза";
+    }
+
+    private void OnEndEarlyClicked(object sender, EventArgs e)
+    {
+        isTimerRunning = false; // Зупиняємо цикл таймера
+        TimerActiveLayout.IsVisible = false;
+
+        // Вираховуємо скільки хвилин реально пройшло (округлюємо у меншу або більшу сторону)
+        int actualMinutes = (int)Math.Ceiling(elapsedSeconds / 60.0);
+
+        if (actualMinutes > 0)
+        {
+            string subject = string.IsNullOrWhiteSpace(FocusSubjectInput.Text) ? "Інше" : FocusSubjectInput.Text.Trim();
+
+            // Зараховуємо до статистики лише фактично проведений час
+            if (subjectStats.ContainsKey(subject))
+            {
+                subjectStats[subject] += actualMinutes;
+            }
+            else
+            {
+                subjectStats[subject] = actualMinutes;
+            }
+
+            SaveStats();
+            UpdateStatsUI();
+
+            DisplayAlert("Сесію завершено", $"Достроково завершено. Зараховано {actualMinutes} хв до предмета «{subject}».", "ОК");
+        }
+        else
+        {
+            DisplayAlert("Скасовано", "Сесія тривала занадто мало, час не зараховано.", "ОК");
+        }
+
+        ResetFocusUI();
+    }
+
     private void OnCancelFocusClicked(object sender, EventArgs e)
     {
         isTimerRunning = false;
+        ResetFocusUI();
+    }
+
+    private void ResetFocusUI()
+    {
+        isTimerRunning = false;
+        isPaused = false;
         TimerActiveLayout.IsVisible = false;
         TimerFinishedLayout.IsVisible = false;
         BtnStartFocus.IsVisible = true;
         FocusSubjectInput.IsEnabled = true;
         FocusDurationInput.IsEnabled = true;
+        BtnPauseResume.Text = "Пауза";
     }
 
     private void OnFinishTaskClicked(object sender, EventArgs e)
@@ -106,8 +174,8 @@ public partial class HomePage : ContentPage
             subjectStats[subject] = sessionMinutes;
         }
 
-        SaveStats();     // Зберігаємо статистику в пам'ять
-        UpdateStatsUI(); // Оновлюємо інтерфейс
+        SaveStats();
+        UpdateStatsUI();
 
         DisplayAlert("Чудово!", $"Сесію на {sessionMinutes} хв завершено й зараховано до предмета «{subject}»!", "ОК");
         OnCancelFocusClicked(sender, e);
