@@ -1,6 +1,6 @@
+using StudyFlow.Models;
 using System.Collections.ObjectModel;
 using System.Text.Json;
-using StudyFlow.Models;
 
 namespace StudyFlow.Views;
 
@@ -65,5 +65,28 @@ public partial class TasksPage : ContentPage
             Tasks.Remove(task);
             SaveTasks(); // Зберігаємо після видалення
         }
+    }
+
+    private void OnAddClicked(object sender, EventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(TitleInput.Text) || string.IsNullOrWhiteSpace(SubjectInput.Text))
+        {
+            DisplayAlert("Помилка", "Заповніть назву та опис!", "ОК");
+            return;
+        }
+
+        Tasks.Add(new TaskItem
+        {
+            Title = TitleInput.Text,
+            Subject = SubjectInput.Text,
+            Deadline = string.IsNullOrWhiteSpace(DeadlineInput.Text) ? "Не вказано" : DeadlineInput.Text,
+            IsCompleted = false
+        });
+
+        SaveTasks();
+
+        TitleInput.Text = string.Empty;
+        SubjectInput.Text = string.Empty;
+        DeadlineInput.Text = string.Empty;
     }
 }

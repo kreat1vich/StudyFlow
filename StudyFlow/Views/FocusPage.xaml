@@ -1,0 +1,43 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="StudyFlow.Views.FocusPage"
+             Title="Фокус"
+             BackgroundColor="#121212">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            <Label Text="🔥 Режим фокусування" FontSize="22" FontAttributes="Bold" TextColor="Orange" HorizontalOptions="Center" />
+
+            <Frame BackgroundColor="#1E1E1E" CornerRadius="16" Padding="16" HasShadow="False">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Що зараз робимо?" TextColor="#B0B0B0" FontSize="14" />
+                    <Entry x:Name="FocusSubjectInput" Placeholder="Назва завдання / предмет" PlaceholderColor="#777" TextColor="White" BackgroundColor="#2C2C2C" />
+
+                    <Label Text="Тривалість (хв):" TextColor="#B0B0B0" FontSize="14" />
+                    <Entry x:Name="FocusDurationInput" Placeholder="Наприклад: 25" PlaceholderColor="#777" TextColor="White" BackgroundColor="#2C2C2C" />
+
+                    <Button x:Name="BtnStartFocus" Text="Почати сесію" Clicked="OnStartFocusClicked" BackgroundColor="#2E7D32" TextColor="White" FontAttributes="Bold" CornerRadius="8" />
+
+                    <!-- Елементи таймера -->
+                    <VerticalStackLayout x:Name="TimerActiveLayout" IsVisible="False" Spacing="15" HorizontalOptions="Center" Margin="0,10,0,0">
+                        <Label x:Name="LblTimerDisplay" Text="25:00" FontSize="44" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" />
+
+                        <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+                            <Button x:Name="BtnPauseResume" Text="Пауза" Clicked="OnPauseResumeClicked" BackgroundColor="#F57C00" TextColor="White" CornerRadius="8" WidthRequest="110" />
+                            <Button x:Name="BtnEndEarly" Text="Завершити" Clicked="OnEndEarlyClicked" BackgroundColor="#C62828" TextColor="White" CornerRadius="8" WidthRequest="110" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- Елементи після завершення -->
+                    <VerticalStackLayout x:Name="TimerFinishedLayout" IsVisible="False" Spacing="12" Margin="0,10,0,0">
+                        <Label Text="🎉 Сесію фокусування завершено!" FontSize="16" FontAttributes="Bold" TextColor="LightGreen" HorizontalOptions="Center" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <Button Grid.Column="0" Text="Зберегти" Clicked="OnFinishTaskClicked" BackgroundColor="#1565C0" TextColor="White" CornerRadius="8" />
+                            <Button Grid.Column="1" Text="Ще раз" Clicked="OnContinueFocusClicked" BackgroundColor="#4527A0" TextColor="White" CornerRadius="8" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
