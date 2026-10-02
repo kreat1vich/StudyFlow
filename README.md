@@ -7,14 +7,12 @@ This is a personal pet project created to practice and deepen skills in building
 ## ✨ Features
 
 ### 📝 Task Management
-
 - Create study tasks with a title, description, and deadline.
 - Easily view and track all current to-do items.
 - Mark tasks as completed.
 - Auto-save tasks upon closing the application.
 
 ### 🎯 Focus Mode
-
 Helps you stay fully concentrated on a specific task for a set period.
 
 Features include:
@@ -23,11 +21,9 @@ Features include:
 - A clear visual countdown showing the remaining time.
 
 ### 📊 Statistics
-
 The app logs every minute spent in Focus Mode, helping you analyze productivity and track real study activity.
 
 ### 💾 Data Storage
-
 All tasks and statistics are saved locally in JSON files, ensuring your data persists even after restarting the app.
 
 ## 🛠️ Tech Stack
@@ -40,13 +36,17 @@ All tasks and statistics are saved locally in JSON files, ensuring your data per
 ## 📱 Main Screens
 
 ### HomePage
-The main dashboard featuring basic navigation and key project overview.
+A modern productivity dashboard featuring:
+- **Timeframe Filtering:** Switch focus statistics view between Day, Week, and Month.
+- **General Metrics:** Quick overview of total study time, number of sessions, and average session length.
+- **Top Subjects:** Lists your most time-consuming study topics (e.g., Mathematics, Programming).
+- **Weekly Activity Chart:** Visual tracking of focus history across the days of the week.
 
 ### TasksPage
 A dedicated workspace for planning and managing your study tasks.
 
 ### Focus Mode
-A timer screen used to run study sessions and log your focus progress.
+A standalone timer screen used to run study sessions and log your focus progress.
 
 ## 🚀 Getting Started
 
