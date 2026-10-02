@@ -1,6 +1,9 @@
-﻿namespace StudyFlow.Models
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace StudyFlow.Models
 {
-    public class TaskItem
+    public class TaskItem : INotifyPropertyChanged
     {
         public string Title { get; set; }      // Назва
         public string Subject { get; set; }    // Предмет
@@ -10,7 +13,21 @@
         public bool IsCompleted
         {
             get => isCompleted;
-            set => isCompleted = value;
+            set
+            {
+                if (isCompleted != value)
+                {
+                    isCompleted = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

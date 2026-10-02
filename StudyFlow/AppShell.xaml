@@ -18,6 +18,11 @@
         <Tab Title="Завдання">
             <ShellContent ContentTemplate="{DataTemplate views:TasksPage}" />
         </Tab>
+
+        <!-- НОВА ВКЛАДКА: Розклад -->
+        <Tab Title="Розклад">
+            <ShellContent ContentTemplate="{DataTemplate views:SchedulePage}" />
+        </Tab>
     </TabBar>
 
 </Shell>
