@@ -1,70 +1,70 @@
 # StudyFlow 📚
 
-StudyFlow - навчальний desktop-застосунок на C# та .NET MAUI для організації завдань, фокусування та обліку часу, витраченого на навчання.
+StudyFlow is a desktop application built with C# and .NET MAUI designed to organize study tasks, improve focus, and track learning time.
 
-Проєкт створено для практики та поглиблення знань із розробки графічних програм на C# та .NET MAUI.
+This is a personal pet project created to practice and deepen skills in building GUI applications using C# and .NET MAUI.
 
-## ✨ Можливості
+## ✨ Features
 
-### 📝 Керування завданнями
+### 📝 Task Management
 
-- Створення навчальних завдань із назвою, описом та дедлайном.
-- Зручний перегляд усіх поточних справ.
-- Позначення завдань як виконаних.
-- Автоматичне збереження списку після закриття програми.
+- Create study tasks with a title, description, and deadline.
+- Easily view and track all current to-do items.
+- Mark tasks as completed.
+- Auto-save tasks upon closing the application.
 
-### 🎯 Режим фокусування (Focus Mode)
+### 🎯 Focus Mode
 
-Допомагає повністю зосередитися на конкретній справі протягом визначеного часу.
+Helps you stay fully concentrated on a specific task for a set period.
 
-Тут можна:
-- Вибрати завдання для поточної сесії.
-- Встановити тривалість таймера.
-- Наочно бачити час, що залишився до кінця сесії.
+Features include:
+- Selecting a specific task for the current session.
+- Setting a custom timer duration.
+- A clear visual countdown showing the remaining time.
 
-### 📊 Статистика
+### 📊 Statistics
 
-Застосунок фіксує кожну хвилину, проведену у Focus Mode. Це допомагає аналізувати власну продуктивність та бачити реальну навчальну активність.
+The app logs every minute spent in Focus Mode, helping you analyze productivity and track real study activity.
 
-### 💾 Збереження даних
+### 💾 Data Storage
 
-Усі завдання та статистика записуються у JSON-файли. Дані залишаються на місці навіть після перезапуску застосунку.
+All tasks and statistics are saved locally in JSON files, ensuring your data persists even after restarting the app.
 
-## 🛠️ Технології
+## 🛠️ Tech Stack
 
 - **C#**
 - **.NET MAUI**
 - **XAML**
 - **JSON**
 
-## 📱 Основні екрани
+## 📱 Main Screens
 
 ### HomePage
-Головний екран із базовою навігацією та ключовою інформацією.
+The main dashboard featuring basic navigation and key project overview.
 
 ### TasksPage
-Робочий простір для планування та контролю навчальних завдань.
+A dedicated workspace for planning and managing your study tasks.
 
 ### Focus Mode
-Екран таймера для запуску навчальних сесій та фіксації прогресу.
+A timer screen used to run study sessions and log your focus progress.
 
-## 🚀 Запуск проєкту
+## 🚀 Getting Started
 
-### Що знадобиться:
-- Visual Studio 2022 або новіша версія.
+### Prerequisites
+- Visual Studio 2022 or newer.
 - .NET SDK.
-- Встановлений компонент (workload) для розробки .NET MAUI.
+- Installed .NET MAUI workload.
 
-### Як запустити:
-1. Клонуйте репозиторій на комп'ютер.
-2. Відкрийте файл `.slnx` або `.sln` у Visual Studio.
-3. Виберіть цільову платформу для запуску.
-4. Натисніть Start (F5).
+### How to Run
+1. Clone the repository to your local machine.
+2. Open the `.slnx` or `.sln` file in Visual Studio.
+3. Select your target deployment platform.
+4. Press Start (F5) to run the application.
 
-## 📌 Версія
+## 📌 Version
 
-**v1.0.0** - перший офіційний стабільний реліз StudyFlow.
+**v1.0.0** - First official stable release of StudyFlow.
 
-## 👨‍💻 Про автора
+## 👨‍💻 About the Author
 
-Власний пет-проєкт для відточування навичок програмування на C#, створення UI на MAUI та роботи з Git/GitHub.
+A personal pet project developed for improving skills in C# programming, crafting UIs with .NET MAUI, and working with Git/GitHub.
