@@ -12,7 +12,15 @@ public partial class FocusPage : ContentPage
     private int totalSeconds = 0;
 
     private const string StatsStorageKey = "saved_study_stats";
+    private const string WeeklyStatsStorageKey = "saved_weekly_study_stats";
+
     public static Dictionary<string, int> subjectStats = new();
+
+    // Зберігаємо хвилини по днях тижня
+    public static Dictionary<string, int> weeklyStats = new()
+    {
+        { "Пн", 0 }, { "Вт", 0 }, { "Ср", 0 }, { "Чт", 0 }, { "Пт", 0 }, { "Сб", 0 }, { "Нд", 0 }
+    };
 
     public FocusPage()
     {
@@ -78,16 +86,20 @@ public partial class FocusPage : ContentPage
         isTimerRunning = false;
         TimerActiveLayout.IsVisible = false;
 
-        int actualMinutes = (int)Math.Ceiling(elapsedSeconds / 60.0);
+        int actualMinutes = elapsedSeconds / 60;
 
         if (actualMinutes > 0)
         {
             string subject = string.IsNullOrWhiteSpace(FocusSubjectInput.Text) ? "Інше" : FocusSubjectInput.Text.Trim();
 
+            // Оновлюємо статистику предметів
             if (subjectStats.ContainsKey(subject))
                 subjectStats[subject] += actualMinutes;
             else
                 subjectStats[subject] = actualMinutes;
+
+            // Додаємо хвилини до поточного дня тижня
+            AddMinutesToCurrentDay(actualMinutes);
 
             SaveStats();
             DisplayAlert("Сесію завершено", $"Достроково зараховано {actualMinutes} хв до предмета «{subject}».", "ОК");
@@ -104,10 +116,14 @@ public partial class FocusPage : ContentPage
     {
         string subject = string.IsNullOrWhiteSpace(FocusSubjectInput.Text) ? "Інше" : FocusSubjectInput.Text.Trim();
 
+        // Оновлюємо статистику предметів
         if (subjectStats.ContainsKey(subject))
             subjectStats[subject] += sessionMinutes;
         else
             subjectStats[subject] = sessionMinutes;
+
+        // Додаємо хвилини до поточного дня тижня
+        AddMinutesToCurrentDay(sessionMinutes);
 
         SaveStats();
         DisplayAlert("Чудово!", $"Сесію на {sessionMinutes} хв зараховано до «{subject}»!", "ОК");
@@ -118,6 +134,36 @@ public partial class FocusPage : ContentPage
     {
         TimerFinishedLayout.IsVisible = false;
         ResetFocusUI();
+    }
+
+    // Допоміжний метод для додавання часу до правильного дня тижня
+    private void AddMinutesToCurrentDay(int minutes)
+    {
+        string currentDayKey = GetCurrentDayKey();
+        if (weeklyStats.ContainsKey(currentDayKey))
+        {
+            weeklyStats[currentDayKey] += minutes;
+        }
+        else
+        {
+            weeklyStats["Пн"] += minutes; // На всяк випадок страховка
+        }
+    }
+
+    // Визначаємо поточний день тижня українською
+    private string GetCurrentDayKey()
+    {
+        return DateTime.Now.DayOfWeek switch
+        {
+            DayOfWeek.Monday => "Пн",
+            DayOfWeek.Tuesday => "Вт",
+            DayOfWeek.Wednesday => "Ср",
+            DayOfWeek.Thursday => "Чт",
+            DayOfWeek.Friday => "Пт",
+            DayOfWeek.Saturday => "Сб",
+            DayOfWeek.Sunday => "Нд",
+            _ => "Пн"
+        };
     }
 
     private void ResetFocusUI()
@@ -136,29 +182,47 @@ public partial class FocusPage : ContentPage
     {
         try
         {
-            var json = JsonSerializer.Serialize(subjectStats);
-            Preferences.Set(StatsStorageKey, json);
+            var jsonStats = JsonSerializer.Serialize(subjectStats);
+            Preferences.Set(StatsStorageKey, jsonStats);
+
+            var jsonWeekly = JsonSerializer.Serialize(weeklyStats);
+            Preferences.Set(WeeklyStatsStorageKey, jsonWeekly);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Помилка: {ex.Message}");
+            Console.WriteLine($"Помилка збереження: {ex.Message}");
         }
     }
 
     private void LoadStats()
     {
-        if (Preferences.ContainsKey(StatsStorageKey))
+        try
         {
-            var json = Preferences.Get(StatsStorageKey, string.Empty);
-            if (!string.IsNullOrEmpty(json))
+            // Завантаження предметів
+            if (Preferences.ContainsKey(StatsStorageKey))
             {
-                try
+                var json = Preferences.Get(StatsStorageKey, string.Empty);
+                if (!string.IsNullOrEmpty(json))
                 {
                     var loaded = JsonSerializer.Deserialize<Dictionary<string, int>>(json);
                     if (loaded != null) subjectStats = loaded;
                 }
-                catch { }
             }
+
+            // Завантаження щоденної статистики
+            if (Preferences.ContainsKey(WeeklyStatsStorageKey))
+            {
+                var jsonWeekly = Preferences.Get(WeeklyStatsStorageKey, string.Empty);
+                if (!string.IsNullOrEmpty(jsonWeekly))
+                {
+                    var loadedWeekly = JsonSerializer.Deserialize<Dictionary<string, int>>(jsonWeekly);
+                    if (loadedWeekly != null) weeklyStats = loadedWeekly;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Помилка завантаження: {ex.Message}");
         }
     }
 }
