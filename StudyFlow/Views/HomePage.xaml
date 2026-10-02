@@ -7,63 +7,18 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="24">
 
-            <!-- ЗАГОЛОВОК ДОДАТКУ -->
-            <Label Text="StudyFlow 🚀" FontSize="26" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" Margin="0,0,0,10"/>
+            <!-- ПРИВІТАННЯ -->
+            <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                <Label Text="StudyFlow 🚀" FontSize="28" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" />
+                <Label Text="Твій персональний менеджер навчання" FontSize="14" TextColor="#B0B0B0" HorizontalOptions="Center" />
+            </VerticalStackLayout>
 
-            <!-- СЕКЦІЯ 1: Створення завдання (у вигляді картки) -->
-            <Frame BackgroundColor="#1E1E1E" CornerRadius="16" Padding="16" HasShadow="False">
-                <VerticalStackLayout Spacing="12">
-                    <Label Text="📌 Нове завдання" FontSize="18" FontAttributes="Bold" TextColor="White" />
-
-                    <Entry x:Name="TitleInput" Placeholder="Назва завдання" PlaceholderColor="#777" TextColor="White" BackgroundColor="#2C2C2C" />
-                    <Entry x:Name="SubjectInput" Placeholder="Опис завдання" PlaceholderColor="#777" TextColor="White" BackgroundColor="#2C2C2C" />
-                    <Entry x:Name="DeadlineInput" Placeholder="Дедлайн завдання" PlaceholderColor="#777" TextColor="White" BackgroundColor="#2C2C2C" />
-
-                    <Button Text="Додати завдання" Clicked="OnAddClicked" BackgroundColor="#512BD4" TextColor="White" FontAttributes="Bold" CornerRadius="8" Margin="0,4,0,0" />
-                </VerticalStackLayout>
-            </Frame>
-
-            <!-- СЕКЦІЯ 2: 🔥 Focus Mode (у вигляді картки) -->
-            <Frame BackgroundColor="#1E1E1E" CornerRadius="16" Padding="16" HasShadow="False">
-                <VerticalStackLayout Spacing="12" x:Name="FocusLayout">
-                    <Label Text="🔥 Режим фокусування" FontSize="18" FontAttributes="Bold" TextColor="Orange" />
-
-                    <Label Text="Що зараз робимо?" TextColor="#B0B0B0" FontSize="14" />
-                    <Entry x:Name="FocusSubjectInput" Placeholder="Назва завдання" PlaceholderColor="#777" TextColor="White" BackgroundColor="#2C2C2C" />
-
-                    <Label Text="Тривалість (хв):" TextColor="#B0B0B0" FontSize="14" />
-                    <Entry x:Name="FocusDurationInput" Placeholder="Наприклад: 25" PlaceholderColor="#777" TextColor="White" BackgroundColor="#2C2C2C" />
-
-                    <Button x:Name="BtnStartFocus" Text="Почати сесію" Clicked="OnStartFocusClicked" BackgroundColor="#2E7D32" TextColor="White" FontAttributes="Bold" CornerRadius="8" Margin="0,4,0,0" />
-
-                    <!-- Елементи таймера -->
-                    <VerticalStackLayout x:Name="TimerActiveLayout" IsVisible="False" Spacing="15" HorizontalOptions="Center" Margin="0,10,0,0">
-                        <Label x:Name="LblTimerDisplay" Text="25:00" FontSize="44" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" />
-
-                        <!-- Кнопки керування таймером (Пауза/Продовжити та Скасувати/Завершити) -->
-                        <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
-                            <Button x:Name="BtnPauseResume" Text="Пауза" Clicked="OnPauseResumeClicked" BackgroundColor="#F57C00" TextColor="White" CornerRadius="8" WidthRequest="110" />
-                            <Button x:Name="BtnEndEarly" Text="Завершити" Clicked="OnEndEarlyClicked" BackgroundColor="#C62828" TextColor="White" CornerRadius="8" WidthRequest="110" />
-                        </HorizontalStackLayout>
-                    </VerticalStackLayout>
-
-                    <!-- Елементи після завершення -->
-                    <VerticalStackLayout x:Name="TimerFinishedLayout" IsVisible="False" Spacing="12" Margin="0,10,0,0">
-                        <Label Text="🎉 Сесію фокусування завершено!" FontSize="16" FontAttributes="Bold" TextColor="LightGreen" HorizontalOptions="Center" />
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                            <Button Grid.Column="0" Text="Зберегти" Clicked="OnFinishTaskClicked" BackgroundColor="#1565C0" TextColor="White" CornerRadius="8" />
-                            <Button Grid.Column="1" Text="Продовжити фокусування" Clicked="OnContinueFocusClicked" BackgroundColor="#4527A0" TextColor="White" CornerRadius="8" />
-                        </Grid>
-                    </VerticalStackLayout>
-                </VerticalStackLayout>
-            </Frame>
-
-            <!-- СЕКЦІЯ 3: Статистика тижня (у вигляді картки) -->
+            <!-- СТАТИСТИКА -->
             <Frame BackgroundColor="#1E1E1E" CornerRadius="16" Padding="16" HasShadow="False">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="📊 Статистика часу" FontSize="18" FontAttributes="Bold" TextColor="White" />
+                    <Label Text="📊 Загальна статистика часу" FontSize="18" FontAttributes="Bold" TextColor="White" />
 
-                    <CollectionView x:Name="StatsCollection" HeightRequest="120" SelectionMode="None">
+                    <CollectionView x:Name="StatsCollection" HeightRequest="150" SelectionMode="None">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
                                 <Grid ColumnDefinitions="*, Auto" Padding="0,6">
