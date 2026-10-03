@@ -1,50 +1,46 @@
 # StudyFlow 📚
 
-StudyFlow is a modern cross-platform application built with C# and .NET MAUI designed to organize study tasks, improve focus, track learning time, and manage daily schedules.
+StudyFlow is a modern cross-platform application built with C# and .NET MAUI designed to organize study tasks, improve focus, track learning time, manage daily schedules, and set long-term learning goals.
 
 This is a personal pet project created to practice and deepen skills in building GUI applications using C# and .NET MAUI.
 
 ## ✨ Features
 
-### 🏠 HomePage & Statistics
-- **Productivity Dashboard:** View general productivity statistics and clear visual reports/charts regarding time spent on learning.
-- **Advanced Metrics & Activity Log:** Filter stats and review weekly activity to monitor real study progress.
+### 🏠 HomePage (Dashboard)
+The central hub providing an overview of your productivity:
+- **Upcoming Deadlines:** Quick view of tasks and events approaching soon.
+- **Productivity Statistics:** Filterable stats and charts by day, week, or month.
+- **Study Streaks:** Daily streak tracker with a UI indicator to keep you consistently motivated.
 
-### 🎯 Focus Mode (Pomodoro Timer)
-Helps you stay fully concentrated on a specific subject or task.
-- **Custom Sessions:** Set session duration tailored to your current task or subject.
-- **Interactive Control:** Full flexibility with pause, early completion, or result saving options.
-- **Automatic Tracking:** Completed focus time is instantly credited to your general productivity statistics.
+### 📝 TasksPage
+A dedicated workspace for managing your to-do items:
+- Create study tasks specifying a title, description, and deadline.
+- Easily view and track current tasks, mark them as completed via checkboxes, or remove them.
+- Auto-save functionality ensures tasks persist between app restarts.
 
-### 📝 Task Management
-- Create study tasks specifying a title, description, and deadlines.
-- Conveniently sort and filter tasks by date and priority.
-- Track completion status via checkboxes with persistent local storage.
+### 🎯 GoalsPage
+A powerful new addition for tracking long-term progress:
+- Create custom learning goals with custom hour targets.
+- Select target periods (Weekly or Monthly).
+- Visual progress bars and countdown timers tracking remaining days and completed hours.
 
-### 📅 Interactive Schedule
-- Manage your daily class and study schedule smoothly across every day of the week (Monday through Sunday).
-- Custom note input and display for better daily planning.
-- Quick editing mode with auto-saving.
+### ⏱️ Focus Mode
+A concentration timer screen to run customized study sessions:
+- Select a specific subject or task and configure custom session durations.
+- Clean visual countdown with full interactive session controls.
+- Automatically logs completed time into your general productivity statistics.
 
-### 🔥 Study Streaks
-- Daily study streak tracking with a built-in UI indicator to keep you motivated consistently.
-
-### 💾 Data Storage
-- All information (tasks, focus sessions, schedules, and stats) is securely saved locally via JSON formats and caching mechanisms, ensuring data persists between app restarts.
+### 📅 Schedule Tab
+A comprehensive weekly planner:
+- Manage class schedules and daily notes smoothly from Monday through Sunday.
+- Quick editing mode with auto-saving to keep your routine up-to-date.
 
 ## 🛠️ Tech Stack
 
 - **C#**
 - **.NET MAUI**
 - **XAML**
-- **JSON**
-
-## 📱 Main Screens & Tabs
-
-- **HomePage:** The main dashboard featuring advanced statistics, weekly activity logs, and quick navigation.
-- **TasksPage:** A dedicated workspace for viewing, sorting, and managing study tasks and deadlines.
-- **Focus Mode:** A concentration timer screen to run customized study sessions.
-- **Schedule Tab:** A dedicated workspace featuring custom note input and display for daily planning.
+- **JSON** (for local data persistence)
 
 ## 🚀 Getting Started
 
@@ -55,14 +51,14 @@ Helps you stay fully concentrated on a specific subject or task.
 
 ### How to Run
 1. Clone the repository to your local machine.
-2. Open the `.slnx` or `.sln` file in Visual Studio.
+2. Open the solution (`.sln` or `.slnx`) file in Visual Studio.
 3. Select your target deployment platform.
-4. Press Start (F5) to run the application.
+4. Press **F5** to build and run the application.
 
 ## 📌 Version
 
-**v1.1.0** - Stable release with expanded planning, schedule management, and study streak tracking capabilities.
+**v1.2.0** - Stable release featuring the brand-new Goals tracking system, schedule planning, and enhanced statistics.
 
 ## 👨‍💻 About the Author
 
-A personal pet project developed for improving skills in C# programming, crafting UIs with .NET MAUI, and working with Git/GitHub.
+A personal pet project developed to improve skills in C# programming, crafting UIs with .NET MAUI, and managing version control via Git/GitHub.
