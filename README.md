@@ -1,30 +1,36 @@
 # StudyFlow 📚
 
-StudyFlow is a desktop application built with C# and .NET MAUI designed to organize study tasks, improve focus, and track learning time.
+StudyFlow is a modern cross-platform application built with C# and .NET MAUI designed to organize study tasks, improve focus, track learning time, and manage daily schedules.
 
 This is a personal pet project created to practice and deepen skills in building GUI applications using C# and .NET MAUI.
 
 ## ✨ Features
 
+### 🏠 HomePage & Statistics
+- **Productivity Dashboard:** View general productivity statistics and clear visual reports/charts regarding time spent on learning.
+- **Advanced Metrics & Activity Log:** Filter stats and review weekly activity to monitor real study progress.
+
+### 🎯 Focus Mode (Pomodoro Timer)
+Helps you stay fully concentrated on a specific subject or task.
+- **Custom Sessions:** Set session duration tailored to your current task or subject.
+- **Interactive Control:** Full flexibility with pause, early completion, or result saving options.
+- **Automatic Tracking:** Completed focus time is instantly credited to your general productivity statistics.
+
 ### 📝 Task Management
-- Create study tasks with a title, description, and deadline.
-- Easily view and track all current to-do items.
-- Mark tasks as completed.
-- Auto-save tasks upon closing the application.
+- Create study tasks specifying a title, description, and deadlines.
+- Conveniently sort and filter tasks by date and priority.
+- Track completion status via checkboxes with persistent local storage.
 
-### 🎯 Focus Mode
-Helps you stay fully concentrated on a specific task for a set period.
+### 📅 Interactive Schedule
+- Manage your daily class and study schedule smoothly across every day of the week (Monday through Sunday).
+- Custom note input and display for better daily planning.
+- Quick editing mode with auto-saving.
 
-Features include:
-- Selecting a specific task for the current session.
-- Setting a custom timer duration.
-- A clear visual countdown showing the remaining time.
-
-### 📊 Statistics
-The app logs every minute spent in Focus Mode, helping you analyze productivity and track real study activity.
+### 🔥 Study Streaks
+- Daily study streak tracking with a built-in UI indicator to keep you motivated consistently.
 
 ### 💾 Data Storage
-All tasks and statistics are saved locally in JSON files, ensuring your data persists even after restarting the app.
+- All information (tasks, focus sessions, schedules, and stats) is securely saved locally via JSON formats and caching mechanisms, ensuring data persists between app restarts.
 
 ## 🛠️ Tech Stack
 
@@ -33,20 +39,12 @@ All tasks and statistics are saved locally in JSON files, ensuring your data per
 - **XAML**
 - **JSON**
 
-## 📱 Main Screens
+## 📱 Main Screens & Tabs
 
-### HomePage
-A modern productivity dashboard featuring:
-- **Timeframe Filtering:** Switch focus statistics view between Day, Week, and Month.
-- **General Metrics:** Quick overview of total study time, number of sessions, and average session length.
-- **Top Subjects:** Lists your most time-consuming study topics (e.g., Mathematics, Programming).
-- **Weekly Activity Chart:** Visual tracking of focus history across the days of the week.
-
-### TasksPage
-A dedicated workspace for planning and managing your study tasks.
-
-### Focus Mode
-A standalone timer screen used to run study sessions and log your focus progress.
+- **HomePage:** The main dashboard featuring advanced statistics, weekly activity logs, and quick navigation.
+- **TasksPage:** A dedicated workspace for viewing, sorting, and managing study tasks and deadlines.
+- **Focus Mode:** A concentration timer screen to run customized study sessions.
+- **Schedule Tab:** A dedicated workspace featuring custom note input and display for daily planning.
 
 ## 🚀 Getting Started
 
@@ -63,7 +61,7 @@ A standalone timer screen used to run study sessions and log your focus progress
 
 ## 📌 Version
 
-**v1.0.0** - First official stable release of StudyFlow.
+**v1.1.0** - Stable release with expanded planning, schedule management, and study streak tracking capabilities.
 
 ## 👨‍💻 About the Author
 
