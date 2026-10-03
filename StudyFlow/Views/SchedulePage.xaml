@@ -8,19 +8,19 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="16">
 
-            <!-- Кнопка Редагувати / Зберегти в єдиному стилі -->
-            <HorizontalStackLayout HorizontalOptions="End">
-                <Button x:Name="BtnEditSave" 
-                        Text="✏️ Редагувати" 
-                        BackgroundColor="#2C2C2C" 
-                        TextColor="White" 
-                        CornerRadius="8" 
-                        Clicked="OnEditSaveClicked"/>
-            </HorizontalStackLayout>
-
-            <!-- Список днів тижня -->
+            <!-- Спочатку йде список днів тижня -->
             <VerticalStackLayout x:Name="DaysLayout" Spacing="12">
             </VerticalStackLayout>
+
+            <!-- Кнопка Редагувати / Зберегти тепер внизу -->
+            <Button x:Name="BtnEditSave" 
+                    Text="✏️ Редагувати" 
+                    BackgroundColor="#2C2C2C" 
+                    TextColor="White" 
+                    CornerRadius="8" 
+                    HeightRequest="45"
+                    HorizontalOptions="Fill" 
+                    Clicked="OnEditSaveClicked"/>
 
         </VerticalStackLayout>
     </ScrollView>
