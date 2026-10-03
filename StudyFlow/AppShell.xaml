@@ -11,18 +11,22 @@
             <ShellContent ContentTemplate="{DataTemplate views:HomePage}" />
         </Tab>
 
-        <Tab Title="Фокус">
-            <ShellContent ContentTemplate="{DataTemplate views:FocusPage}" />
-        </Tab>
-
         <Tab Title="Завдання">
             <ShellContent ContentTemplate="{DataTemplate views:TasksPage}" />
         </Tab>
 
-        <!-- НОВА ВКЛАДКА: Розклад -->
+        <Tab Title="Цілі">
+            <ShellContent ContentTemplate="{DataTemplate views:GoalsPage}" />
+        </Tab>
+
+        <Tab Title="Фокус">
+            <ShellContent ContentTemplate="{DataTemplate views:FocusPage}" />
+        </Tab>
+
         <Tab Title="Розклад">
             <ShellContent ContentTemplate="{DataTemplate views:SchedulePage}" />
         </Tab>
+
     </TabBar>
 
 </Shell>

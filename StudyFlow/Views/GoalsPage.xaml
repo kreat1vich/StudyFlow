@@ -1,0 +1,54 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="StudyFlow.Views.GoalsPage"
+             Title="Цілі"
+             BackgroundColor="#121212">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="16">
+
+            <!-- Блок створення нової цілі -->
+            <Frame BackgroundColor="#1E1E1E" CornerRadius="16" Padding="16" HasShadow="False">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="🎯 Нова ціль навчання" FontSize="16" FontAttributes="Bold" TextColor="White" />
+
+                    <Entry x:Name="GoalSubjectInput" Placeholder="Назва цілі" PlaceholderColor="#777" TextColor="White" BackgroundColor="#2C2C2C" HeightRequest="45" />
+                    <Entry x:Name="GoalHoursInput" Placeholder="Кількість годин" PlaceholderColor="#777" TextColor="White" BackgroundColor="#2C2C2C" Keyboard="Numeric" HeightRequest="45" />
+
+                    <!-- Вибір періоду (Кнопки замість Пікера) -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Період" FontSize="12" TextColor="#888888" />
+                        <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
+                            <Button x:Name="BtnWeek" 
+                                    Grid.Column="0" 
+                                    Text="Тиждень" 
+                                    BackgroundColor="#512BD4" 
+                                    TextColor="White" 
+                                    FontAttributes="Bold" 
+                                    CornerRadius="8" 
+                                    HeightRequest="42" 
+                                    Clicked="OnPeriodButtonClicked" />
+
+                            <Button x:Name="BtnMonth" 
+                                    Grid.Column="1" 
+                                    Text="Місяць" 
+                                    BackgroundColor="#2C2C2C" 
+                                    TextColor="White" 
+                                    CornerRadius="8" 
+                                    HeightRequest="42" 
+                                    Clicked="OnPeriodButtonClicked" />
+                        </Grid>
+                    </VerticalStackLayout>
+
+                    <Button Text="Додати ціль" Clicked="OnAddGoalClicked" BackgroundColor="#512BD4" TextColor="White" FontAttributes="Bold" CornerRadius="8" HeightRequest="45" Margin="0,4,0,0" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Label Text="📌 Ваші активні цілі:" FontSize="16" FontAttributes="Bold" TextColor="White" />
+
+            <!-- Динамічний список цілей (замість CollectionView) -->
+            <VerticalStackLayout x:Name="GoalsContainer" Spacing="12" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
