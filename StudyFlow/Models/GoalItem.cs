@@ -7,7 +7,7 @@ namespace StudyFlow.Models
     {
         public string Subject { get; set; }
         public double TargetHours { get; set; }
-        public string Period { get; set; }         // "Тиждень" або "Місяць"
+        public string Period { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         [JsonIgnore]
@@ -72,25 +72,16 @@ namespace StudyFlow.Models
             }
         }
 
-        // Нова властивість: обчислює скільки днів залишилось до кінця тижня чи місяця
         [JsonIgnore]
         public string DaysLeftText
         {
             get
             {
-                var today = DateTime.Today;
-                DateTime deadline;
+                // Якщо CreatedAt чомусь скинувся, ставимо сьогодні
+                if (CreatedAt == default) CreatedAt = DateTime.Today;
 
-                if (Period == "Тиждень")
-                {
-                    // Робимо дедлайн рівно через 7 днів після створення цілі
-                    deadline = CreatedAt.Date.AddDays(7);
-                }
-                else // "Місяць"
-                {
-                    // Робимо дедлайн через 1 місяць після створення цілі
-                    deadline = CreatedAt.Date.AddMonths(1);
-                }
+                var today = DateTime.Today;
+                DateTime deadline = Period == "Тиждень" ? CreatedAt.Date.AddDays(7) : CreatedAt.Date.AddMonths(1);
 
                 int daysLeft = (deadline - today).Days;
 
@@ -109,24 +100,28 @@ namespace StudyFlow.Models
                 if (FocusPage.allSessions == null || !FocusPage.allSessions.Any())
                     return 0;
 
-                var now = DateTime.Now;
+                if (CreatedAt == default) CreatedAt = DateTime.Today;
 
+                // Фільтруємо за назвою предмета
                 var filtered = FocusPage.allSessions.Where(s =>
                     string.Equals(s.Subject?.Trim(), Subject?.Trim(), StringComparison.OrdinalIgnoreCase));
 
+                var startDate = CreatedAt.Date;
+                DateTime endDate;
+
                 if (Period == "Тиждень")
                 {
-                    var today = now.Date;
-                    int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
-                    var startOfWeek = today.AddDays(-diff);
-                    var endOfWeek = startOfWeek.AddDays(7);
-
-                    filtered = filtered.Where(s => s.Date >= startOfWeek && s.Date < endOfWeek);
+                    // Робимо інтервал рівно 7 днів від моменту створення цілі
+                    endDate = startDate.AddDays(7);
                 }
-                else if (Period == "Місяць")
+                else // "Місяць"
                 {
-                    filtered = filtered.Where(s => s.Date.Month == now.Month && s.Date.Year == now.Year);
+                    // Робимо інтервал рівно 1 місяць (30 днів) від моменту створення цілі
+                    endDate = startDate.AddMonths(1);
                 }
+
+                // Рахуємо сесії, які відбулися в діапазоні від створення цілі до дедлайну
+                filtered = filtered.Where(s => s.Date.Date >= startDate && s.Date.Date < endDate);
 
                 return filtered.Sum(s => s.Minutes);
             }

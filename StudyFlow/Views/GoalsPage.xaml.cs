@@ -17,6 +17,12 @@ public partial class GoalsPage : ContentPage
         LoadGoals();
 
         Goals.CollectionChanged += (s, e) => RenderGoals();
+    }
+
+    // Додаємо цей метод, щоб цілі перераховувалися щоразу при переході на сторінку
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
         RenderGoals();
     }
 
@@ -88,8 +94,6 @@ public partial class GoalsPage : ContentPage
             };
 
             var lblSubject = new Label { Text = goal.Subject, FontSize = 16, FontAttributes = FontAttributes.Bold, TextColor = Colors.White };
-
-            // Виводимо кількість днів замість слова "Тиждень/Місяць"
             var lblDaysLeft = new Label { Text = goal.DaysLeftText, FontSize = 12, TextColor = Color.FromArgb("#8A75F5"), VerticalOptions = LayoutOptions.Center };
 
             Grid.SetColumn(lblSubject, 0);

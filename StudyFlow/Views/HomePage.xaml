@@ -50,7 +50,7 @@
             <!-- КАРТКА З ПОКАЗНИКАМИ (СПИСКОМ) -->
             <Frame BackgroundColor="#1E1E1E" CornerRadius="16" Padding="16" HasShadow="False">
                 <VerticalStackLayout Spacing="12">
-                    <Label Text="📊 Загальні показники" FontSize="18" FontAttributes="Bold" TextColor="White" Margin="0,0,0,4" />
+                    <Label Text="📊 Показники фокусування" FontSize="18" FontAttributes="Bold" TextColor="White" Margin="0,0,0,4" />
 
                     <!-- Рядок 0: Загальний час -->
                     <Grid ColumnDefinitions="*, Auto">
