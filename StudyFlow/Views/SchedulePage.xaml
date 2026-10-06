@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="StudyFlow.Views.SchedulePage"
+             Title="Розклад"
+             BackgroundColor="#121212">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
+
+            <!-- Спочатку йде список днів тижня -->
+            <VerticalStackLayout x:Name="DaysLayout" Spacing="12">
+            </VerticalStackLayout>
+
+            <!-- Кнопка Редагувати / Зберегти тепер внизу -->
+            <Button x:Name="BtnEditSave" 
+                    Text="✏️ Редагувати" 
+                    BackgroundColor="#2C2C2C" 
+                    TextColor="White" 
+                    CornerRadius="8" 
+                    HeightRequest="45"
+                    HorizontalOptions="Fill" 
+                    Clicked="OnEditSaveClicked"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="StudyFlow.Views.TasksPage"
+             Title="Завдання"
+             BackgroundColor="#121212">
+
+    <Grid Padding="16" RowSpacing="16" RowDefinitions="Auto,*">
+        <Frame Grid.Row="0" BackgroundColor="#1E1E1E" CornerRadius="16" Padding="16" HasShadow="False">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="📌 Нове завдання" FontSize="16" FontAttributes="Bold" TextColor="White" />
+                <Entry x:Name="TitleInput" Placeholder="Назва завдання" PlaceholderColor="#777" TextColor="White" BackgroundColor="#2C2C2C" HeightRequest="45" />
+                <Entry x:Name="SubjectInput" Placeholder="Предмет / опис" PlaceholderColor="#777" TextColor="White" BackgroundColor="#2C2C2C" HeightRequest="45" />
+                <Entry x:Name="DeadlineInput" Placeholder="Дедлайн: 06.10 або 06.10.2026" PlaceholderColor="#777" TextColor="White" BackgroundColor="#2C2C2C" HeightRequest="45" />
+                <Button Text="Додати завдання" Clicked="OnAddClicked" BackgroundColor="#512BD4" TextColor="White" FontAttributes="Bold" CornerRadius="8" HeightRequest="45" />
+            </VerticalStackLayout>
+        </Frame>
+
+        <CollectionView Grid.Row="1" x:Name="TasksCollection" SelectionMode="None">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Padding="20" Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label Text="📋" FontSize="32" HorizontalOptions="Center" />
+                    <Label Text="Поки що немає завдань" TextColor="#B0B0B0" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame BackgroundColor="#1E1E1E" CornerRadius="12" Padding="10" Margin="0,0,0,8" HasShadow="False">
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10">
+                            <CheckBox Grid.Column="0" IsChecked="{Binding IsCompleted}" CheckedChanged="OnCheckBoxCheckedChanged" VerticalOptions="Center" />
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold" TextColor="White" LineBreakMode="TailTruncation" />
+                                <Label Text="{Binding Subject}" FontSize="12" TextColor="#B0B0B0" LineBreakMode="TailTruncation" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="2" Text="{Binding Deadline}" FontSize="12" TextColor="#FFB74D" VerticalOptions="Center" />
+                            <Button Grid.Column="3" Text="🗑️" Clicked="OnDeleteClicked" CommandParameter="{Binding .}" HeightRequest="40" WidthRequest="45" BackgroundColor="#2A2A2A" />
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>
