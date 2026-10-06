@@ -260,15 +260,21 @@ public partial class HomePage : ContentPage
         ChartLayout.Children.Clear();
 
         var today = DateTime.Today;
+
+        // Знаходимо понеділок поточного тижня
+        int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
+        var monday = today.AddDays(-diff);
+
         Dictionary<string, int> weeklyStats = new()
         {
             { "Пн", 0 }, { "Вт", 0 }, { "Ср", 0 }, { "Чт", 0 }, { "Пт", 0 }, { "Сб", 0 }, { "Нд", 0 }
         };
 
-        var recentSessions = StudyDataStore.Sessions
-            .Where(s => s.Date.Date >= today.AddDays(-6) && s.Date.Date <= today);
+        // Фільтруємо сесії виключно в межах поточного тижня (від понеділка по неділю)
+        var weekSessions = StudyDataStore.Sessions
+            .Where(s => s.Date.Date >= monday && s.Date.Date <= monday.AddDays(6));
 
-        foreach (var session in recentSessions)
+        foreach (var session in weekSessions)
         {
             string dayKey = session.Date.DayOfWeek switch
             {
@@ -279,10 +285,10 @@ public partial class HomePage : ContentPage
                 DayOfWeek.Friday => "Пт",
                 DayOfWeek.Saturday => "Сб",
                 DayOfWeek.Sunday => "Нд",
-                _ => "Пн"
+                _ => null
             };
 
-            if (weeklyStats.ContainsKey(dayKey))
+            if (dayKey != null && weeklyStats.ContainsKey(dayKey))
                 weeklyStats[dayKey] += session.Minutes;
         }
 
@@ -293,16 +299,15 @@ public partial class HomePage : ContentPage
             var rowGrid = new Grid
             {
                 ColumnDefinitions = new ColumnDefinitionCollection
-                {
-                    new ColumnDefinition(GridLength.Auto),
-                    new ColumnDefinition(GridLength.Star),
-                    new ColumnDefinition(GridLength.Auto)
-                },
+            {
+                new ColumnDefinition(GridLength.Auto),
+                new ColumnDefinition(GridLength.Star),
+                new ColumnDefinition(GridLength.Auto)
+            },
                 ColumnSpacing = 10,
                 VerticalOptions = LayoutOptions.Center
             };
 
-            // 1. Назва дня
             var lblDay = new Label
             {
                 Text = day.Key,
@@ -314,7 +319,6 @@ public partial class HomePage : ContentPage
             Grid.SetColumn(lblDay, 0);
             rowGrid.Children.Add(lblDay);
 
-            // 2. Смужка (бар)
             double maxWidth = 160;
             double barWidth = day.Value > 0 ? Math.Max(15, (double)day.Value / (maxMinutes > 0 ? maxMinutes : 1) * maxWidth) : 0;
 
@@ -330,7 +334,6 @@ public partial class HomePage : ContentPage
             Grid.SetColumn(bar, 1);
             rowGrid.Children.Add(bar);
 
-            // 3. Текст із хвилинами праворуч
             string timeText = day.Value > 0 ? FormatMinutes(day.Value) : "—";
             var lblMinutes = new Label
             {

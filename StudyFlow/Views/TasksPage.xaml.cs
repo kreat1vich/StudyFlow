@@ -67,6 +67,7 @@ public partial class TasksPage : ContentPage
 
     private async void OnCheckBoxCheckedChanged(object sender, CheckedChangedEventArgs e)
     {
+        SortTasks();
         await StudyDataStore.SaveTasksAsync();
     }
 

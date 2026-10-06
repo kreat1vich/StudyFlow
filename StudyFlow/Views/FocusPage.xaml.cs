@@ -189,7 +189,6 @@ public partial class FocusPage : ContentPage
             $"Сесію на {sessionMinutes} хв завершено. Додати нотатку?",
             accept: "Зберегти",
             cancel: "Пропустити",
-            placeholder: "Наприклад: вивчив LINQ Where та Select",
             maxLength: 120);
 
         await RecordSessionAsync(subject, sessionMinutes, note);
